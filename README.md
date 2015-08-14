@@ -1,13 +1,13 @@
 ##Social Media Share Counts
-###Cool stuff from DBS>Interactive
+*Cool stuff from DBS>Interactive*
 
+DBS-Share-Count is an efficient way to add social media share/like counts to your WordPress project. Uses WordPress Transients for caching and allows you to write your markup the way you want to.
 
 ####Quick Use
 
 Include dbs_share_count.php in your functions file.
 
 ```php
-
 require_once("dbs_share_count.php");
 
 ```
@@ -15,7 +15,6 @@ require_once("dbs_share_count.php");
 Instantiate the class on the template you want to display your share count data on.
 
 ```php
-
 $options = array(
 	"share_url" => WP_SITEURL . $_SERVER['REQUEST_URI'], // Default - Required
 	"share_title" => get_the_title() . " at @the_most_awesome_company", // Optional
@@ -26,18 +25,15 @@ $options = array(
 );
 
 $sharecount = new DBSShareCount( $options );
-
 ```
 
 
 Add this to your template file.
 
 ```php
-
 <li class="facebook">
      <a href="<?php echo $sharecount->get_facebook_url(); ?>" title="Share on Facebook">
        Like <span class="count"><?php echo $sharecount->get_fb_likes(); ?></span>
    </a>
 </li>
-
 ```
