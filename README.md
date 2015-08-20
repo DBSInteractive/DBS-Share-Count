@@ -1,5 +1,5 @@
 ##Social Media Share Counts
-*Cool stuff from DBS>Interactive*
+*In development and not complete.*
 
 DBS-Share-Count is an efficient way to add social media share/like counts to your WordPress project. Uses WordPress Transients for caching and allows you to write your markup the way you want to.
 
