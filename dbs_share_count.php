@@ -42,7 +42,7 @@ class DBSShareCount {
             $media_url;
 
     private $defaults = array (
-        "share_url" => WP_SITEURL . $_SERVER['REQUEST_URI'],
+        "share_url" => WP_SITEURL,
         "media_url" => "",
         "share_title" => "",
         "share_text" => "",
@@ -52,7 +52,6 @@ class DBSShareCount {
 
     function __construct( $options = array() ){
         $this->options 			= array_merge( $options, $this->defaults );
-        
         $this->share_title 		= rawurlencode( $options["share_title"] );
         $this->share_text 		= rawurlencode( $options["share_text"] );
         $this->twitter_summary 	= rawurlencode( $options["twitter_summary"] );
@@ -86,7 +85,7 @@ class DBSShareCount {
      * @return string Share URL
      */
     function get_google_url(){
-        return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $url;
+        return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $this->url;
     }
 
     /**
@@ -94,7 +93,7 @@ class DBSShareCount {
      * @return string Share URL
      */
     function get_pinterest_url(){
-        return "http://pinterest.com/pin/create/button/?url=" . $url . "&media=" . $media_url . "&description=" . $share_text;
+        return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
     }
 
 
@@ -236,7 +235,7 @@ class DBSShareCount {
     /**
      * Initiates an HTTP request for information
      * @param  String $url The request url
-     * @return String 	   The response data      
+     * @return String 	   The response data
      */
     private function file_get_contents_curl( $url ){
         $ch = curl_init();
