@@ -282,9 +282,10 @@ class DBSShareCount {
         curl_setopt( $ch, CURLOPT_TIMEOUT, 8 ); // Timeout after 8 seconds. Prevents your page from white screen of terror.
         $cont = curl_exec( $ch );
 
-        if( curl_error( $ch ) ) {
-            die( curl_error($ch) );
-        }
+        if( curl_error( $ch ) || empty( $cont ) ) {
+            error_log( 'Share Count: ' . curl_error($ch) );
+            return '';
+   	}
 
         return $cont;
     }
