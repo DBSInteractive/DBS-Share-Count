@@ -41,7 +41,7 @@ class DBSShareCount {
             $twitter_summary,
             $media_url;
 
-    private $defaults = array (
+    private $defaults = array(
         "share_url" => WP_SITEURL,
         "media_url" => "",
         "share_title" => "",
@@ -96,7 +96,21 @@ class DBSShareCount {
         return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
     }
 
+    /**
+     * Returns correct linkedin share url
+     * @return string Share URL
+     */
+    function get_linkedin_url(){
+    	return "https://www.linkedin.com/shareArticle?mini=true&url=" . $this->url . "&title=" . $this->share_title . "&summary=" . $this->share_text;
+    }
 
+    /**
+     * Returns correct mail share URL
+     * @return string Share URL
+     */
+    function get_mail_url(){
+    	return "mailto:?&subject=" . $this->share_title . "&body=" . $this->share_text;
+    }
 
 
 
@@ -201,14 +215,14 @@ class DBSShareCount {
     }
 
     /**
-     * Stores social count data using WP_Transients. Sets cache for $timeout * Hours.
+     * Stores social count data using WP_Transients. Sets cache for $this->timeout * Hours.
      * @param  "String" $social_platform Social media platform reference
      * @param  "String" $data            Social count data
      */
     private function store_transient( $social_platform, $data ) {
-        $url_platform = $url . $social_platform;
+        $url_platform = $this->url . $social_platform;
         $trans_url = get_transient( $url_platform );
-        set_transient( $url_platform, $data , $timeout * HOUR_IN_SECONDS );
+        set_transient( $url_platform, $data , $this->timeout * HOUR_IN_SECONDS );
     }
 
     /**
@@ -217,7 +231,7 @@ class DBSShareCount {
      * @return boolean					True if the transient exists.
      */
     private function is_transient( $social_platform ) {
-        $url_platform = $url . $social_platform;
+        $url_platform = $this->url . $social_platform;
         $trans_url = get_transient( $url_platform );
         return ( false === $trans_url ) ? false : true;
     }
@@ -228,7 +242,7 @@ class DBSShareCount {
      * @return array                Transient Data
      */
     private function dbs_get_transient( $social_platform ){
-        $url_platform = $url . $social_platform;
+        $url_platform = $this->url . $social_platform;
         return get_transient( $url_platform );
     }
 
