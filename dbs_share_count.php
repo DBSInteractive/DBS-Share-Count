@@ -97,7 +97,21 @@ class DBSShareCount {
         return "http://pinterest.com/pin/create/button/?url=" . $url . "&media=" . $media_url . "&description=" . $share_text;
     }
 
+    /**
+     * Returns correct linkedin share url
+     * @return string Share URL
+     */
+    function get_linkedin_url(){
+    	return "https://www.linkedin.com/shareArticle?mini=true&url=" . $url . "&title=" . $this->share_title . "&summary=" . $share_text;
+    }
 
+    /**
+     * Returns correct mail share URL
+     * @return string Share URL
+     */
+    function get_mail_url(){
+    	return "mailto:?&subject=" . $this->share_title . "&body=".$share_text."";
+    }
 
 
 
