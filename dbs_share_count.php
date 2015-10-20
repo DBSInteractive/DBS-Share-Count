@@ -32,26 +32,30 @@
  */
 
 class DBSShareCount {
-    
+
     private $url,
             $timeout,
             $share_url,
             $share_title,
             $share_text,
             $twitter_summary,
-            $media_url;
+			$media_url;
 
     private $defaults = array(
-        "share_url" => WP_SITEURL,
+        "share_url" => "",
         "media_url" => "",
         "share_title" => "",
         "share_text" => "",
         "twitter_summary" => "",
         "timeout" => 4 // in hours.
-    );
+	);
 
     function __construct( $options = array() ){
-        $this->options 			= array_merge( $options, $this->defaults );
+		$options 			= array_merge( $options, $this->defaults );
+
+		if( empty($options["share_url"] ) ) {
+			$options["share_url"] = $this->default_share_url();
+		}
         $this->share_title 		= rawurlencode( $options["share_title"] );
         $this->share_text 		= rawurlencode( $options["share_text"] );
         $this->twitter_summary 	= rawurlencode( $options["twitter_summary"] );
@@ -60,9 +64,26 @@ class DBSShareCount {
         $this->timeout 			= $options["timeout"];
     }
 
+	/**
+	 * Returns the current page's url
+	 *
+	 * @return string page's URL
+	 **/
+	function default_share_url(){
+		$server = $_SERVER;
+		$protocol = 'http';
+		$port = $server['SERVER_PORT'];
+		$url = $server['REQUEST_URI'];
 
+		if( !empty( $server['HTTPS'] ) && $server['HTTPS'] == 'on' ) {
+			$protocol = 'https';
+		}
+		if( ( $port == '80' ) || ( $port=='443' && $protocol == 'https' ) ) {
+			$port = '';
+		}
 
-
+		return $protocol . "://" . $host . $port . $url;
+	}
 
     /**
      * Returns Correct Twitter Share url
@@ -122,13 +143,13 @@ class DBSShareCount {
     function get_twitter() {
         if( $this->is_transient("twitter") ){
             $this->dbs_get_transient("twitter");
-            
+
             return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
         } else {
             $json_string = $this->file_get_contents_curl('http://urls.api.twitter.com/1/urls/count.json?url=' . $this->url);
             $json = json_decode($json_string, true);
             $this->store_transient("twitter");
-            
+
             return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
         }
     }
@@ -140,13 +161,13 @@ class DBSShareCount {
     function get_fb_likes() {
         if( $this->is_transient("fb_likes") ){
             $this->dbs_get_transient("fb_likes");
-            
+
             return isset( $json[0]['like_count'] ) ? intval( $json[0]['like_count'] ) : 0;
         } else {
             $json_string = $this->file_get_contents_curl('http://api.facebook.com/restserver.php?method=links.getStats&format=json&urls='.$this->url);
             $json = json_decode($json_string, true);
             $this->store_transient("fb_likes");
-            
+
             return isset( $json[0]['like_count'] ) ? intval($json[0]['like_count']) : 0;
         }
     }
@@ -176,7 +197,7 @@ class DBSShareCount {
     function get_plusones()  {
         if( $this->is_transient("plusones") ){
             $data = $this->dbs_get_transient("plusones");
-            
+
             return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
         } else {
             $curl = curl_init();
@@ -264,7 +285,7 @@ class DBSShareCount {
         if( curl_error( $ch ) ) {
             die( curl_error($ch) );
         }
-        
+
         return $cont;
     }
 
