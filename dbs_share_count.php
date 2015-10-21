@@ -33,36 +33,37 @@
 
 class DBSShareCount {
 
-    private $url,
-            $timeout,
-            $share_url,
-            $share_title,
-            $share_text,
-            $twitter_summary,
-			$media_url;
+	private $url,
+		$timeout,
+		$share_url,
+		$share_title,
+		$share_text,
+		$twitter_summary,
+		$media_url;
 
-    private $defaults = array(
-        "share_url" => "",
-        "media_url" => "",
-        "share_title" => "",
-        "share_text" => "",
-        "twitter_summary" => "",
-        "timeout" => 4 // in hours.
+	private $defaults = array(
+		"share_url" => "",
+		"media_url" => "",
+		"share_title" => "",
+		"share_text" => "",
+		"twitter_summary" => "",
+		"timeout" => 4 // in hours.
 	);
 
-    function __construct( $options = array() ){
-		$options 			= array_merge( $options, $this->defaults );
-
+	function __construct( $options = array() ){
+		$options = array_merge( $options, $this->defaults );
+		
 		if( empty($options["share_url"] ) ) {
 			$options["share_url"] = $this->default_share_url();
 		}
-        $this->share_title 		= rawurlencode( $options["share_title"] );
-        $this->share_text 		= rawurlencode( $options["share_text"] );
-        $this->twitter_summary 	= rawurlencode( $options["twitter_summary"] );
-        $this->url 				= rawurlencode( $options["share_url"] );
-        $this->media_url 		= $options["media_url"] ;
-        $this->timeout 			= $options["timeout"];
-    }
+		
+		$this->share_title = rawurlencode( $options["share_title"] );
+		$this->share_text = rawurlencode( $options["share_text"] );
+		$this->twitter_summary = rawurlencode( $options["twitter_summary"] );
+		$this->url = rawurlencode( $options["share_url"] );
+		$this->media_url = $options["media_url"] ;
+		$this->timeout = $options["timeout"];
+	}
 
 	/**
 	 * Returns the current page's url
@@ -74,14 +75,14 @@ class DBSShareCount {
 		$protocol = 'http';
 		$port = $server['SERVER_PORT'];
 		$url = $server['REQUEST_URI'];
-
+		
 		if( !empty( $server['HTTPS'] ) && $server['HTTPS'] == 'on' ) {
 			$protocol = 'https';
 		}
 		if( ( $port == '80' ) || ( $port=='443' && $protocol == 'https' ) ) {
 			$port = '';
 		}
-
+		
 		return $protocol . "://" . $host . $port . $url;
 	}
 
@@ -89,70 +90,70 @@ class DBSShareCount {
      * Returns Correct Twitter Share url
      * @return string Share URL
      */
-    function get_twitter_url(){
-        return "http://twitter.com/share?url=" . $this->url . "&text=" . $this->twitter_summary;
-    }
+	function get_twitter_url(){
+		return "http://twitter.com/share?url=" . $this->url . "&text=" . $this->twitter_summary;
+	}
 
     /**
      * Returns Correct Facebook Share url
      * @return string Share URL
      */
-    function get_facebook_url(){
-        return "https://www.facebook.com/sharer/sharer.php?s=100&p[url]=" . $this->url . "&p[images][0]=" . $this->media_url . "&p[title]=" . $this->share_title . "&p[summary]=" . $this->share_text;
-    }
+	function get_facebook_url(){
+		return "https://www.facebook.com/sharer/sharer.php?s=100&p[url]=" . $this->url . "&p[images][0]=" . $this->media_url . "&p[title]=" . $this->share_title . "&p[summary]=" . $this->share_text;
+	}
 
     /**
      * Returns Correct Google Plus Share url
      * @return string Share URL
      */
-    function get_google_url(){
-        return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $this->url;
-    }
+	function get_google_url(){
+		return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $this->url;
+	}
 
     /**
      * Returns Correct Pinterest Share url
      * @return string Share URL
      */
-    function get_pinterest_url(){
-        return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
-    }
+	function get_pinterest_url(){
+		return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
+	}
 
     /**
      * Returns correct linkedin share url
      * @return string Share URL
      */
-    function get_linkedin_url(){
-    	return "https://www.linkedin.com/shareArticle?mini=true&url=" . $this->url . "&title=" . $this->share_title . "&summary=" . $this->share_text;
-    }
+	function get_linkedin_url(){
+		return "https://www.linkedin.com/shareArticle?mini=true&url=" . $this->url . "&title=" . $this->share_title . "&summary=" . $this->share_text;
+	}
 
     /**
      * Returns correct mail share URL
      * @return string Share URL
      */
-    function get_mail_url(){
-    	return "mailto:?&subject=" . $this->share_title . "&body=" . $this->share_text;
-    }
+	function get_mail_url(){
+		return "mailto:?&subject=" . $this->share_title . "&body=" . $this->share_text;
+	}
 
 
 
 
     /**
-     * Gets Twitter Share count
-     * @return int Share Count Number
-     */
-    function get_twitter() {
-        if( $this->is_transient("twitter") ){
-            $this->dbs_get_transient("twitter");
-
-            return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
-        } else {
-            $json_string = $this->file_get_contents_curl('http://urls.api.twitter.com/1/urls/count.json?url=' . $this->url);
-            $json = json_decode($json_string, true);
-            $this->store_transient("twitter");
-
-            return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
-        }
-    }
+	* Gets Twitter Share count
+	* @return int Share Count Number
+	*/
+	function get_twitter() {
+		if( $this->is_transient("twitter") ){
+			$this->dbs_get_transient("twitter");
+			
+			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
+		} else {
+			$json_string = $this->file_get_contents_curl('http://urls.api.twitter.com/1/urls/count.json?url=' . $this->url);
+			$json = json_decode($json_string, true);
+			$this->store_transient("twitter");
+			
+			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
+		}
+	}
 
     /**
      * Gets Facebook Like count
@@ -172,49 +173,49 @@ class DBSShareCount {
         }
     }
 
-    /**
-     * Gets Facebook Share count
-     * @return int Share Count Number
-     */
-    function get_fb_shares() {
-        if( $this->is_transient("fb_shares") ){
-            $data = $this->dbs_get_transient("fb_shares");
+	/**
+	* Gets Facebook Share count
+	* @return int Share Count Number
+	*/
+	function get_fb_shares() {
+		if( $this->is_transient("fb_shares") ){
+			$data = $this->dbs_get_transient("fb_shares");
+			
+			return isset($json[0]['share_count'])?intval($json[0]['share_count']):0;
+		} else {
+			$json_string = $this->file_get_contents_curl('http://api.facebook.com/restserver.php?method=links.getStats&format=json&urls='.$this->url);
+			$json = json_decode($json_string, true);
+			$this->store_transient("fb_shares");
+			
+			return isset( $json[0]['share_count'] ) ? intval( $json[0]['share_count'] ) : 0;
+		}
+	}
 
-            return isset($json[0]['share_count'])?intval($json[0]['share_count']):0;
-        } else {
-            $json_string = $this->file_get_contents_curl('http://api.facebook.com/restserver.php?method=links.getStats&format=json&urls='.$this->url);
-            $json = json_decode($json_string, true);
-            $this->store_transient("fb_shares");
-
-            return isset( $json[0]['share_count'] ) ? intval( $json[0]['share_count'] ) : 0;
-        }
-    }
-
-    /**
-     * Gets Google Plus +1 count
-     * @return int Share Count Number
-     */
-    function get_plusones()  {
-        if( $this->is_transient("plusones") ){
-            $data = $this->dbs_get_transient("plusones");
-
-            return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
-        } else {
-            $curl = curl_init();
-            curl_setopt( $curl, CURLOPT_URL, "https://clients6.google.com/rpc" );
-            curl_setopt( $curl, CURLOPT_POST, true );
-            curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
-            curl_setopt( $curl, CURLOPT_POSTFIELDS, '[{"method":"pos.plusones.get","id":"p","params":{"nolog":true,"id":"'.rawurldecode( $this->url ).'","source":"widget","userId":"@viewer","groupId":"@self"},"jsonrpc":"2.0","key":"p","apiVersion":"v1"}]' );
-            curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-            curl_setopt( $curl, CURLOPT_HTTPHEADER, array('Content-type: application/json') );
-            $curl_results = curl_exec ($curl);
-            curl_close ($curl);
-            $json = json_decode($curl_results, true);
-            $this->store_transient("plusones");
-
-            return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
-        }
-    }
+	/**
+	* Gets Google Plus +1 count
+	* @return int Share Count Number
+	*/
+	function get_plusones()  {
+		if( $this->is_transient("plusones") ){
+			$data = $this->dbs_get_transient("plusones");
+			
+			return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
+		} else {
+			$curl = curl_init();
+			curl_setopt( $curl, CURLOPT_URL, "https://clients6.google.com/rpc" );
+			curl_setopt( $curl, CURLOPT_POST, true );
+			curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
+			curl_setopt( $curl, CURLOPT_POSTFIELDS, '[{"method":"pos.plusones.get","id":"p","params":{"nolog":true,"id":"'.rawurldecode( $this->url ).'","source":"widget","userId":"@viewer","groupId":"@self"},"jsonrpc":"2.0","key":"p","apiVersion":"v1"}]' );
+			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+			curl_setopt( $curl, CURLOPT_HTTPHEADER, array('Content-type: application/json') );
+			$curl_results = curl_exec ($curl);
+			curl_close ($curl);
+			$json = json_decode($curl_results, true);
+			$this->store_transient("plusones");
+			
+			return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
+		}
+	}
 
     /**
      * Gets Pinterest Share count
@@ -240,54 +241,54 @@ class DBSShareCount {
      * @param  "String" $social_platform Social media platform reference
      * @param  "String" $data            Social count data
      */
-    private function store_transient( $social_platform, $data ) {
-        $url_platform = $this->url . $social_platform;
-        $trans_url = get_transient( $url_platform );
-        set_transient( $url_platform, $data , $this->timeout * HOUR_IN_SECONDS );
-    }
+	private function store_transient( $social_platform, $data ) {
+		$url_platform = $this->url . $social_platform;
+		$trans_url = get_transient( $url_platform );
+		set_transient( $url_platform, $data , $this->timeout * HOUR_IN_SECONDS );
+	}
 
     /**
      * Checks to see if a certain WP_Transient exists.
      * @param  String  $social_platform Social media platform reference
      * @return boolean					True if the transient exists.
      */
-    private function is_transient( $social_platform ) {
-        $url_platform = $this->url . $social_platform;
-        $trans_url = get_transient( $url_platform );
-        return ( false === $trans_url ) ? false : true;
-    }
+	private function is_transient( $social_platform ) {
+		$url_platform = $this->url . $social_platform;
+		$trans_url = get_transient( $url_platform );
+		return ( false === $trans_url ) ? false : true;
+	}
 
     /**
      * Pulls the transient data
      * @param  String  $social_platform Social media platform reference
      * @return array                Transient Data
      */
-    private function dbs_get_transient( $social_platform ){
-        $url_platform = $this->url . $social_platform;
-        return get_transient( $url_platform );
-    }
+	private function dbs_get_transient( $social_platform ){
+		$url_platform = $this->url . $social_platform;
+		return get_transient( $url_platform );
+	}
 
-    /**
-     * Initiates an HTTP request for information
-     * @param  String $url The request url
-     * @return String 	   The response data
-     */
-    private function file_get_contents_curl( $url ){
-        $ch = curl_init();
-        curl_setopt( $ch, CURLOPT_URL, $url );
-        curl_setopt( $ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT'] );
-        curl_setopt( $ch, CURLOPT_FAILONERROR, 1 );
-        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
-        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-        curl_setopt( $ch, CURLOPT_TIMEOUT, 8 ); // Timeout after 8 seconds. Prevents your page from white screen of terror.
-        $cont = curl_exec( $ch );
-
-        if( curl_error( $ch ) || empty( $cont ) ) {
-            error_log( 'Share Count: ' . curl_error($ch) );
-            return '';
-   	}
-
-        return $cont;
-    }
+	/**
+	* Initiates an HTTP request for information
+	* @param  String $url The request url
+	* @return String 	   The response data
+	*/
+	private function file_get_contents_curl( $url ){
+		$ch = curl_init();
+		curl_setopt( $ch, CURLOPT_URL, $url );
+		curl_setopt( $ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT'] );
+		curl_setopt( $ch, CURLOPT_FAILONERROR, 1 );
+		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1 );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+		curl_setopt( $ch, CURLOPT_TIMEOUT, 8 ); // Timeout after 8 seconds. Prevents your page from white screen of terror.
+		$cont = curl_exec( $ch );
+		
+		if( curl_error( $ch ) || empty( $cont ) ) {
+			error_log( 'Share Count: ' . curl_error($ch) );
+			return '';
+		}
+		
+		return $cont;
+	}
 
 }
