@@ -1,35 +1,35 @@
 <?php
 /**
- * Builds Share URLS and gets social count of urls from the top social media platforms.
- * This also uses WordPress Transients to cache the social media API requests.
- * For more information on WordPress Transients visit: https://codex.wordpress.org/Transients_API
- *
- * @author  DBS>Interactive - 2015-07-08
- * @license CC BY-SA 4.0 - http://creativecommons.org/licenses/by-sa/4.0/ - DBS>Interactive
- * @example
- *
- * // require this php file in Functions.php
- *
- * // Instantiate new DBSShareCount class and pass it the required options.
- * $options = array(
- *    "share_url" => WP_SITEURL . $_SERVER['REQUEST_URI'], // REQUIRED
- *    "share_title" => get_the_title() . " at @the_most_awesome_company", // Optional
- *    "share_text" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
- *    "twitter_summary" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
- *    "media_url" => $share_media, // Optional
- *    "timeout" => 4 // Optional
- * );
- *
- * $sharecount = new DBSShareCount( $options );
- *
- *
- * // IN YOUR TEMPLATE FILES
- * <li class="facebook">
- *     <a href="<?php echo $sharecount->get_facebook_url(); ?>" title="Share on Facebook">
- *         Like <span class="count"><?php echo $sharecount->get_fb_likes(); ?></span>
- *     </a>
- * </li>
- */
+* Builds Share URLS and gets social count of urls from the top social media platforms.
+* This also uses WordPress Transients to cache the social media API requests.
+* For more information on WordPress Transients visit: https://codex.wordpress.org/Transients_API
+*
+* @author  DBS>Interactive - 2015-07-08
+* @license CC BY-SA 4.0 - http://creativecommons.org/licenses/by-sa/4.0/ - DBS>Interactive
+* @example
+*
+* // require this php file in Functions.php
+*
+* // Instantiate new DBSShareCount class and pass it the required options.
+* $options = array(
+*    "share_url" => WP_SITEURL . $_SERVER['REQUEST_URI'], // REQUIRED
+*    "share_title" => get_the_title() . " at @the_most_awesome_company", // Optional
+*    "share_text" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
+*    "twitter_summary" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
+*    "media_url" => $share_media, // Optional
+*    "timeout" => 4 // Optional
+* );
+*
+* $sharecount = new DBSShareCount( $options );
+*
+*
+* // IN YOUR TEMPLATE FILES
+* <li class="facebook">
+*     <a href="<?php echo $sharecount->get_facebook_url(); ?>" title="Share on Facebook">
+*         Like <span class="count"><?php echo $sharecount->get_fb_likes(); ?></span>
+*     </a>
+* </li>
+*/
 
 class DBSShareCount {
 
@@ -66,10 +66,10 @@ class DBSShareCount {
 	}
 
 	/**
-	 * Returns the current page's url
-	 *
-	 * @return string page's URL
-	 **/
+	* Returns the current page's url
+	*
+	* @return string page's URL
+	*/
 	function default_share_url(){
 		$server = $_SERVER;
 		$protocol = 'http';
@@ -86,50 +86,50 @@ class DBSShareCount {
 		return $protocol . "://" . $host . $port . $url;
 	}
 
-    /**
-     * Returns Correct Twitter Share url
-     * @return string Share URL
-     */
+	/**
+	* Returns Correct Twitter Share url
+	* @return string Share URL
+	*/
 	function get_twitter_url(){
 		return "http://twitter.com/share?url=" . $this->url . "&text=" . $this->twitter_summary;
 	}
 
-    /**
-     * Returns Correct Facebook Share url
-     * @return string Share URL
-     */
+	/**
+	* Returns Correct Facebook Share url
+	* @return string Share URL
+	*/
 	function get_facebook_url(){
 		return "https://www.facebook.com/sharer/sharer.php?s=100&p[url]=" . $this->url . "&p[images][0]=" . $this->media_url . "&p[title]=" . $this->share_title . "&p[summary]=" . $this->share_text;
 	}
 
-    /**
-     * Returns Correct Google Plus Share url
-     * @return string Share URL
-     */
+	/**
+	* Returns Correct Google Plus Share url
+	* @return string Share URL
+	*/
 	function get_google_url(){
 		return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $this->url;
 	}
 
-    /**
-     * Returns Correct Pinterest Share url
-     * @return string Share URL
-     */
+	/**
+	* Returns Correct Pinterest Share url
+	* @return string Share URL
+	*/
 	function get_pinterest_url(){
 		return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
 	}
 
-    /**
-     * Returns correct linkedin share url
-     * @return string Share URL
-     */
+	/**
+	* Returns correct linkedin share url
+	* @return string Share URL
+	*/
 	function get_linkedin_url(){
 		return "https://www.linkedin.com/shareArticle?mini=true&url=" . $this->url . "&title=" . $this->share_title . "&summary=" . $this->share_text;
 	}
 
-    /**
-     * Returns correct mail share URL
-     * @return string Share URL
-     */
+	/**
+	* Returns correct mail share URL
+	* @return string Share URL
+	*/
 	function get_mail_url(){
 		return "mailto:?&subject=" . $this->share_title . "&body=" . $this->share_text;
 	}
@@ -137,7 +137,7 @@ class DBSShareCount {
 
 
 
-    /**
+	/**
 	* Gets Twitter Share count
 	* @return int Share Count Number
 	*/
@@ -155,10 +155,10 @@ class DBSShareCount {
 		}
 	}
 
-    /**
-     * Gets Facebook Like count
-     * @return int Share Count Number
-     */
+	/**
+	* Gets Facebook Like count
+	* @return int Share Count Number
+	*/
     function get_fb_likes() {
         if( $this->is_transient("fb_likes") ){
             $this->dbs_get_transient("fb_likes");
@@ -217,10 +217,10 @@ class DBSShareCount {
 		}
 	}
 
-    /**
-     * Gets Pinterest Share count
-     * @return int Share Count Number
-     */
+	/**
+	* Gets Pinterest Share count
+	* @return int Share Count Number
+	*/
     function get_pinterest() {
         if( $this->is_transient("pinterest") ){
             $data = $this->dbs_get_transient("pinterest");
@@ -236,33 +236,33 @@ class DBSShareCount {
         }
     }
 
-    /**
-     * Stores social count data using WP_Transients. Sets cache for $this->timeout * Hours.
-     * @param  "String" $social_platform Social media platform reference
-     * @param  "String" $data            Social count data
-     */
+	/**
+	* Stores social count data using WP_Transients. Sets cache for $this->timeout * Hours.
+	* @param  "String" $social_platform Social media platform reference
+	* @param  "String" $data            Social count data
+	*/
 	private function store_transient( $social_platform, $data ) {
 		$url_platform = $this->url . $social_platform;
 		$trans_url = get_transient( $url_platform );
 		set_transient( $url_platform, $data , $this->timeout * HOUR_IN_SECONDS );
 	}
 
-    /**
-     * Checks to see if a certain WP_Transient exists.
-     * @param  String  $social_platform Social media platform reference
-     * @return boolean					True if the transient exists.
-     */
+	/**
+	* Checks to see if a certain WP_Transient exists.
+	* @param  String  $social_platform Social media platform reference
+	* @return boolean					True if the transient exists.
+	*/
 	private function is_transient( $social_platform ) {
 		$url_platform = $this->url . $social_platform;
 		$trans_url = get_transient( $url_platform );
 		return ( false === $trans_url ) ? false : true;
 	}
 
-    /**
-     * Pulls the transient data
-     * @param  String  $social_platform Social media platform reference
-     * @return array                Transient Data
-     */
+	/**
+	* Pulls the transient data
+	* @param  String  $social_platform Social media platform reference
+	* @return array                Transient Data
+	*/
 	private function dbs_get_transient( $social_platform ){
 		$url_platform = $this->url . $social_platform;
 		return get_transient( $url_platform );
