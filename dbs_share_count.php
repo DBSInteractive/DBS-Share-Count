@@ -25,7 +25,7 @@
 *
 * // IN YOUR TEMPLATE FILES
 * <li class="facebook">
-*     <a href="<?php echo $sharecount->get_facebook_url(); ?>" title="Share on Facebook">
+*     <a href="<?php echo $sharecount->get_share_url('facebook'); ?>" title="Share on Facebook">
 *         Like <span class="count"><?php echo $sharecount->get_fb_likes(); ?></span>
 *     </a>
 * </li>
@@ -52,11 +52,11 @@ class DBSShareCount {
 
 	function __construct( $options = array() ){
 		$options = array_merge( $options, $this->defaults );
-		
+
 		if( empty($options["share_url"] ) ) {
 			$options["share_url"] = $this->default_share_url();
 		}
-		
+
 		$this->share_title = rawurlencode( $options["share_title"] );
 		$this->share_text = rawurlencode( $options["share_text"] );
 		$this->twitter_summary = rawurlencode( $options["twitter_summary"] );
@@ -75,67 +75,47 @@ class DBSShareCount {
 		$protocol = 'http';
 		$port = $server['SERVER_PORT'];
 		$url = $server['REQUEST_URI'];
-		
+
 		if( !empty( $server['HTTPS'] ) && $server['HTTPS'] == 'on' ) {
 			$protocol = 'https';
 		}
 		if( ( $port == '80' ) || ( $port=='443' && $protocol == 'https' ) ) {
 			$port = '';
 		}
-		
+
 		return $protocol . "://" . $host . $port . $url;
 	}
 
 	/**
-	* Returns Correct Twitter Share url
+	* Return the appropriate share URL
+	*
+	* @param string $platform
 	* @return string Share URL
 	*/
-	function get_twitter_url(){
-		return "http://twitter.com/share?url=" . $this->url . "&text=" . $this->twitter_summary;
+	function get_share_url($platform){
+		switch ($platform) {
+			case "facebook":
+				return "https://www.facebook.com/sharer/sharer.php?s=100&p[url]=" . $this->url . "&p[images][0]=" . $this->media_url . "&p[title]=" . $this->share_title . "&p[summary]=" . $this->share_text;
+
+			case "twitter":
+				return "http://twitter.com/share?url=" . $this->url . "&text=" . $this->twitter_summary;
+
+			case "google":
+				return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $this->url;
+
+			case "pinterest":
+				return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
+
+			case "linkedin":
+				return "https://www.linkedin.com/shareArticle?mini=true&url=" . $this->url . "&title=" . $this->share_title . "&summary=" . $this->share_text;
+
+			case "mail":
+				return "mailto:?&subject=" . $this->share_title . "&body=" . $this->share_text;
+
+			default:
+				return "!! Platform Not Found !!";
+		}
 	}
-
-	/**
-	* Returns Correct Facebook Share url
-	* @return string Share URL
-	*/
-	function get_facebook_url(){
-		return "https://www.facebook.com/sharer/sharer.php?s=100&p[url]=" . $this->url . "&p[images][0]=" . $this->media_url . "&p[title]=" . $this->share_title . "&p[summary]=" . $this->share_text;
-	}
-
-	/**
-	* Returns Correct Google Plus Share url
-	* @return string Share URL
-	*/
-	function get_google_url(){
-		return "https://plusone.google.com/_/+1/confirm?hl=en&url=" . $this->url;
-	}
-
-	/**
-	* Returns Correct Pinterest Share url
-	* @return string Share URL
-	*/
-	function get_pinterest_url(){
-		return "http://pinterest.com/pin/create/button/?url=" . $this->url . "&media=" . $this->media_url . "&description=" . $this->share_text;
-	}
-
-	/**
-	* Returns correct linkedin share url
-	* @return string Share URL
-	*/
-	function get_linkedin_url(){
-		return "https://www.linkedin.com/shareArticle?mini=true&url=" . $this->url . "&title=" . $this->share_title . "&summary=" . $this->share_text;
-	}
-
-	/**
-	* Returns correct mail share URL
-	* @return string Share URL
-	*/
-	function get_mail_url(){
-		return "mailto:?&subject=" . $this->share_title . "&body=" . $this->share_text;
-	}
-
-
-
 
 	/**
 	* Gets Twitter Share count
@@ -144,13 +124,13 @@ class DBSShareCount {
 	function get_twitter() {
 		if( $this->is_transient("twitter") ){
 			$this->dbs_get_transient("twitter");
-			
+
 			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
 		} else {
 			$json_string = $this->file_get_contents_curl('http://urls.api.twitter.com/1/urls/count.json?url=' . $this->url);
 			$json = json_decode($json_string, true);
 			$this->store_transient("twitter");
-			
+
 			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
 		}
 	}
@@ -180,13 +160,13 @@ class DBSShareCount {
 	function get_fb_shares() {
 		if( $this->is_transient("fb_shares") ){
 			$data = $this->dbs_get_transient("fb_shares");
-			
+
 			return isset($json[0]['share_count'])?intval($json[0]['share_count']):0;
 		} else {
 			$json_string = $this->file_get_contents_curl('http://api.facebook.com/restserver.php?method=links.getStats&format=json&urls='.$this->url);
 			$json = json_decode($json_string, true);
 			$this->store_transient("fb_shares");
-			
+
 			return isset( $json[0]['share_count'] ) ? intval( $json[0]['share_count'] ) : 0;
 		}
 	}
@@ -198,7 +178,7 @@ class DBSShareCount {
 	function get_plusones()  {
 		if( $this->is_transient("plusones") ){
 			$data = $this->dbs_get_transient("plusones");
-			
+
 			return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
 		} else {
 			$curl = curl_init();
@@ -212,7 +192,7 @@ class DBSShareCount {
 			curl_close ($curl);
 			$json = json_decode($curl_results, true);
 			$this->store_transient("plusones");
-			
+
 			return isset( $json[0]['result']['metadata']['globalCounts']['count'] ) ? intval( $json[0]['result']['metadata']['globalCounts']['count'] ) : 0;
 		}
 	}
@@ -282,12 +262,12 @@ class DBSShareCount {
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, 8 ); // Timeout after 8 seconds. Prevents your page from white screen of terror.
 		$cont = curl_exec( $ch );
-		
+
 		if( curl_error( $ch ) || empty( $cont ) ) {
 			error_log( 'Share Count: ' . curl_error($ch) );
 			return '';
 		}
-		
+
 		return $cont;
 	}
 
