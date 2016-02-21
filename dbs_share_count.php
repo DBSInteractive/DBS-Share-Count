@@ -4,7 +4,7 @@
 * This also uses WordPress Transients to cache the social media API requests.
 * For more information on WordPress Transients visit: https://codex.wordpress.org/Transients_API
 *
-* @author  DBS>Interactive - 2015-07-08
+* @author	DBS>Interactive - 2015-07-08
 * @license CC BY-SA 4.0 - http://creativecommons.org/licenses/by-sa/4.0/ - DBS>Interactive
 * @example
 *
@@ -12,12 +12,12 @@
 *
 * // Instantiate new DBSShareCount class and pass it the required options.
 * $options = array(
-*    "share_url" => WP_SITEURL . $_SERVER['REQUEST_URI'], // REQUIRED
-*    "share_title" => get_the_title() . " at @the_most_awesome_company", // Optional
-*    "share_text" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
-*    "twitter_summary" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
-*    "media_url" => $share_media, // Optional
-*    "timeout" => 4 // Optional
+*		"share_url" => WP_SITEURL . $_SERVER['REQUEST_URI'], // REQUIRED
+*		"share_title" => get_the_title() . " at @the_most_awesome_company", // Optional
+*		"share_text" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
+*		"twitter_summary" => "Check out " . get_the_title() . " @the_most_awesome_company", // Optional
+*		"media_url" => $share_media, // Optional
+*		"timeout" => 4 // Optional
 * );
 *
 * $sharecount = new DBSShareCount( $options );
@@ -25,9 +25,9 @@
 *
 * // IN YOUR TEMPLATE FILES
 * <li class="facebook">
-*     <a href="<?php echo $sharecount->get_share_url('facebook'); ?>" title="Share on Facebook">
-*         Like <span class="count"><?php echo $sharecount->get_fb_likes(); ?></span>
-*     </a>
+*		 <a href="<?php echo $sharecount->get_share_url('facebook'); ?>" title="Share on Facebook">
+*				 Like <span class="count"><?php echo $sharecount->get_count('likes'); ?></span>
+*		 </a>
 * </li>
 */
 
@@ -70,7 +70,7 @@ class DBSShareCount {
 	*
 	* @return string page's URL
 	*/
-	function default_share_url(){
+	private function default_share_url(){
 		$server = $_SERVER;
 		$protocol = 'http';
 		$port = $server['SERVER_PORT'];
@@ -92,7 +92,7 @@ class DBSShareCount {
 	* @param string $platform
 	* @return string Share URL
 	*/
-	function get_share_url($platform){
+	public function get_share_url($platform){
 		switch ($platform) {
 			case "facebook":
 				return "https://www.facebook.com/sharer/sharer.php?s=100&p[url]=" . $this->url . "&p[images][0]=" . $this->media_url . "&p[title]=" . $this->share_title . "&p[summary]=" . $this->share_text;
@@ -118,10 +118,38 @@ class DBSShareCount {
 	}
 
 	/**
+	* Calls the appropriate function by type of shares
+	*
+	* @param string $type
+	* @return [type]			 [description]
+	*/
+	public function get_count($type){
+		switch ($type){
+			case "tweets":
+				return $this->get_twitter();
+
+			case "likes":
+				return $this->get_fb_likes();
+
+			case "shares":
+				return $this->get_fb_shares();
+
+			case "plusones":
+				return $this->get_plusones();
+
+			case "pins":
+				return $this->get_pinterest();
+
+			default:
+				return "!! Count Platform Not Found !!";
+		}
+	}
+
+	/**
 	* Gets Twitter Share count
 	* @return int Share Count Number
 	*/
-	function get_twitter() {
+	private function get_twitter() {
 		if( $this->is_transient("twitter") ){
 			$this->dbs_get_transient("twitter");
 
@@ -139,25 +167,25 @@ class DBSShareCount {
 	* Gets Facebook Like count
 	* @return int Share Count Number
 	*/
-    function get_fb_likes() {
-        if( $this->is_transient("fb_likes") ){
-            $this->dbs_get_transient("fb_likes");
+	private function get_fb_likes() {
+		if( $this->is_transient("fb_likes") ){
+			$this->dbs_get_transient("fb_likes");
 
-            return isset( $json[0]['like_count'] ) ? intval( $json[0]['like_count'] ) : 0;
-        } else {
-            $json_string = $this->file_get_contents_curl('http://api.facebook.com/restserver.php?method=links.getStats&format=json&urls='.$this->url);
-            $json = json_decode($json_string, true);
-            $this->store_transient("fb_likes");
+			return isset( $json[0]['like_count'] ) ? intval( $json[0]['like_count'] ) : 0;
+		} else {
+			$json_string = $this->file_get_contents_curl('http://api.facebook.com/restserver.php?method=links.getStats&format=json&urls='.$this->url);
+			$json = json_decode($json_string, true);
+			$this->store_transient("fb_likes");
 
-            return isset( $json[0]['like_count'] ) ? intval($json[0]['like_count']) : 0;
-        }
-    }
+			return isset( $json[0]['like_count'] ) ? intval($json[0]['like_count']) : 0;
+		}
+	}
 
 	/**
 	* Gets Facebook Share count
 	* @return int Share Count Number
 	*/
-	function get_fb_shares() {
+	private function get_fb_shares() {
 		if( $this->is_transient("fb_shares") ){
 			$data = $this->dbs_get_transient("fb_shares");
 
@@ -175,7 +203,7 @@ class DBSShareCount {
 	* Gets Google Plus +1 count
 	* @return int Share Count Number
 	*/
-	function get_plusones()  {
+	private function get_plusones()	{
 		if( $this->is_transient("plusones") ){
 			$data = $this->dbs_get_transient("plusones");
 
@@ -201,25 +229,25 @@ class DBSShareCount {
 	* Gets Pinterest Share count
 	* @return int Share Count Number
 	*/
-    function get_pinterest() {
-        if( $this->is_transient("pinterest") ){
-            $data = $this->dbs_get_transient("pinterest");
+	private function get_pinterest() {
+		if( $this->is_transient("pinterest") ){
+			$data = $this->dbs_get_transient("pinterest");
 
-            return isset( $data['count'] ) ? intval( $data['count'] ) : 0;
-        } else {
-            $return_data = $this->file_get_contents_curl('http://api.pinterest.com/v1/urls/count.json?url='.$this->url);
-            $json_string = preg_replace('/^receiveCount((.*))$/', "\1", $return_data);
-            $json = json_decode( $json_string, true );
-            $this->store_transient("pinterest", $json);
+			return isset( $data['count'] ) ? intval( $data['count'] ) : 0;
+		} else {
+			$return_data = $this->file_get_contents_curl('http://api.pinterest.com/v1/urls/count.json?url='.$this->url);
+			$json_string = preg_replace('/^receiveCount((.*))$/', "\1", $return_data);
+			$json = json_decode( $json_string, true );
+			$this->store_transient("pinterest", $json);
 
-            return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
-        }
-    }
+			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
+		}
+	}
 
 	/**
 	* Stores social count data using WP_Transients. Sets cache for $this->timeout * Hours.
-	* @param  "String" $social_platform Social media platform reference
-	* @param  "String" $data            Social count data
+	* @param	"String" $social_platform Social media platform reference
+	* @param	"String" $data						Social count data
 	*/
 	private function store_transient( $social_platform, $data ) {
 		$url_platform = $this->url . $social_platform;
@@ -229,7 +257,7 @@ class DBSShareCount {
 
 	/**
 	* Checks to see if a certain WP_Transient exists.
-	* @param  String  $social_platform Social media platform reference
+	* @param	String	$social_platform Social media platform reference
 	* @return boolean					True if the transient exists.
 	*/
 	private function is_transient( $social_platform ) {
@@ -240,8 +268,8 @@ class DBSShareCount {
 
 	/**
 	* Pulls the transient data
-	* @param  String  $social_platform Social media platform reference
-	* @return array                Transient Data
+	* @param	String	$social_platform Social media platform reference
+	* @return array								Transient Data
 	*/
 	private function dbs_get_transient( $social_platform ){
 		$url_platform = $this->url . $social_platform;
@@ -250,8 +278,8 @@ class DBSShareCount {
 
 	/**
 	* Initiates an HTTP request for information
-	* @param  String $url The request url
-	* @return String 	   The response data
+	* @param	String $url The request url
+	* @return String 		 The response data
 	*/
 	private function file_get_contents_curl( $url ){
 		$ch = curl_init();
