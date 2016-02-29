@@ -32,8 +32,8 @@ Add this to your template file.
 
 ```php
 <li class="facebook">
-     <a href="<?php echo $sharecount->get_facebook_url(); ?>" title="Share on Facebook">
-       Like <span class="count"><?php echo $sharecount->get_fb_likes(); ?></span>
+     <a href="<?php echo $sharecount->get_share_url('facebook'); ?>" title="Share on Facebook">
+       Like <span class="count"><?php echo $sharecount->get_count('likes'); ?></span>
    </a>
 </li>
 ```
