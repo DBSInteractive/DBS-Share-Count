@@ -145,23 +145,6 @@ class DBSShareCount {
 		}
 	}
 
-	/**
-	* Gets Twitter Share count
-	* @return int Share Count Number
-	*/
-	private function get_twitter() {
-		if( $this->is_transient("twitter") ){
-			$this->dbs_get_transient("twitter");
-
-			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
-		} else {
-			$json_string = $this->file_get_contents_curl('http://urls.api.twitter.com/1/urls/count.json?url=' . $this->url);
-			$json = json_decode($json_string, true);
-			$this->store_transient("twitter");
-
-			return isset( $json['count'] ) ? intval( $json['count'] ) : 0;
-		}
-	}
 
 	/**
 	* Gets Facebook Like count
